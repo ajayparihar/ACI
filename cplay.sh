@@ -9,9 +9,9 @@ git add .
 
 echo "Committing..."
 commit_message=$(<commitM.txt)
-baseline_message=$(<baseline.txt)
+config_message=$(<config.txt)
 
-git commit -m "$commit_message$baseline_message"
+git commit -m "$commit_message$config_message"
 
 echo "Pushing into the branch..."
 git push
