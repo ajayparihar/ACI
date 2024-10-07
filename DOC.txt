@@ -1,0 +1,199 @@
+Thank you for the clarification! Here’s the updated documentation with the correct script name. 
+
+---
+
+### Script 1: `s.sh`
+
+#### How to Setup
+1. **Prerequisites**: Ensure Git is installed on your system.
+2. **Create `repo_details.txt`**: Create a text file named `repo_details.txt` in the same directory as the script. The first line should contain the path to your Git repository.
+3. **Make the Script Executable**: Run `chmod +x s.sh` to make the script executable.
+
+#### How to Use
+- To display the status of a Git repository:
+  ```bash
+  ./s.sh -p <repository_path>
+  ```
+- To use the default path from `repo_details.txt`:
+  ```bash
+  ./s.sh
+  ```
+- To see the help message:
+  ```bash
+  ./s.sh -h
+  ```
+
+#### Functionality
+- Checks if Git is installed.
+- Reads the repository path from `repo_details.txt` or accepts it as a command-line argument.
+- Navigates to the specified Git repository and runs `git status`.
+
+#### Error Handling
+- Displays an error message if Git is not installed.
+- Checks if the `repo_details.txt` file exists and reads from it.
+- Validates the existence of the specified repository path.
+
+---
+
+### Script 2: `check.sh`
+
+#### How to Setup
+1. **Prerequisites**: Ensure Git is installed.
+2. **Create or update `repo_details.txt`**: Include the repository path on the first line and branch name on the second line.
+3. **Make the Script Executable**: Run `chmod +x check.sh`.
+
+#### How to Use
+- To check out a branch:
+  ```bash
+  ./check.sh -b <branch_name>
+  ```
+- To specify a repository path:
+  ```bash
+  ./check.sh -p <repository_path> -b <branch_name>
+  ```
+- To see the help message:
+  ```bash
+  ./check.sh -h
+  ```
+
+#### Functionality
+- Validates if Git is installed.
+- Reads repository details from `repo_details.txt` or command-line arguments.
+- Changes to the specified repository directory and checks out the specified branch.
+
+#### Error Handling
+- Displays an error if Git is not installed.
+- Checks for the existence of `repo_details.txt`.
+- Verifies that the specified branch exists before checking it out.
+
+---
+
+### Script 3: `base.sh`
+
+#### How to Setup
+1. **Prerequisites**: Ensure Git is installed.
+2. **Create `repo_details.txt` and `commit_message.txt`**: Place the repository path in the first line and branch name in the second line of `repo_details.txt`. Create `commit_message.txt` for default commit messages.
+3. **Make the Script Executable**: Run `chmod +x base.sh`.
+
+#### How to Use
+- To commit and push changes with an inline message:
+  ```bash
+  ./base.sh -m "<commit_message>"
+  ```
+- To use the commit message from `commit_message.txt`:
+  ```bash
+  ./base.sh
+  ```
+- To see the help message:
+  ```bash
+  ./base.sh -h
+  ```
+
+#### Functionality
+- Checks if Git is installed.
+- Reads repository details and commit messages from respective text files or command-line arguments.
+- Adds all files to the Git index, commits them, and pushes to the specified branch.
+
+#### Error Handling
+- Handles missing files for repository details or commit messages.
+- Validates the repository path and checks for successful Git operations.
+
+---
+
+### Script 4: `config.sh`
+
+#### How to Setup
+1. **Prerequisites**: Ensure Git is installed.
+2. **Create `repo_details.txt` and `commit_message.txt`**: Same as Script 3.
+3. **Make the Script Executable**: Run `chmod +x config.sh`.
+
+#### How to Use
+- To commit and push changes with an inline message:
+  ```bash
+  ./config.sh -m "<commit_message>"
+  ```
+- To use the default message from `commit_message.txt`:
+  ```bash
+  ./config.sh
+  ```
+- To see the help message:
+  ```bash
+  ./config.sh -h
+  ```
+
+#### Functionality
+- Similar to Script 3 but appends `_config` to the commit message.
+- Allows users to commit changes and push to the specified branch.
+
+#### Error Handling
+- Handles missing files and invalid Git operations.
+- Displays error messages for common issues.
+
+---
+
+### Script 5: `reset.sh`
+
+#### How to Setup
+1. **Prerequisites**: Ensure Git is installed.
+2. **Create `repo_details.txt`**: Include the repository path as before.
+3. **Make the Script Executable**: Run `chmod +x reset.sh`.
+
+#### How to Use
+- To reset commits on a branch:
+  ```bash
+  ./reset.sh -n <num_commits>
+  ```
+- To specify the branch name and repository path:
+  ```bash
+  ./reset.sh -p <repository_path> -b <branch_name> -n <num_commits>
+  ```
+- To see the help message:
+  ```bash
+  ./reset.sh -h
+  ```
+
+#### Functionality
+- Resets the specified number of commits on a given branch.
+- Supports committing ranges.
+- Forces the push to the remote repository after resetting.
+
+#### Error Handling
+- Checks for valid commit ranges and handles invalid inputs gracefully.
+- Displays errors for Git installation and directory access issues.
+
+---
+
+### Combined Documentation for All Scripts
+
+#### How to Setup
+1. **Prerequisites**: Ensure Git is installed on your system.
+2. **File Creation**:
+   - Create `repo_details.txt` containing the repository path (first line) and branch name (second line).
+   - For `base.sh` and `config.sh`, create `commit_message.txt` for commit messages.
+3. **Make Scripts Executable**: Run `chmod +x <script_name>.sh` for each script.
+
+#### How to Use
+- Each script can be executed with specific command-line options.
+- Use `-h` to display help messages for each script.
+
+#### Functionality
+- **`s.sh`**: Checks the status of a Git repository.
+- **`check.sh`**: Checks out a specified branch in the repository.
+- **`base.sh`**: Commits and pushes changes to the repository.
+- **`config.sh`**: Similar to the previous script but modifies the commit message.
+- **`reset.sh`**: Resets a specified number of commits on a branch.
+
+#### Error Handling
+- Each script has error handling for:
+  - Missing or inaccessible files.
+  - Git installation checks.
+  - Invalid repository paths.
+  - Invalid branch or commit specifications.
+
+#### Additional Important Notes
+- **Backup**: Always ensure you have backups of important data before running operations that modify commit history or repository states.
+- **Testing**: It’s a good practice to test scripts in a safe environment (like a test repository) before using them on critical projects.
+- **Permissions**: Make sure you have the necessary permissions to access and modify the repository and its files.
+- **Logging**: Consider adding logging features to track actions performed by the scripts for future reference and debugging.
+
+--- 
