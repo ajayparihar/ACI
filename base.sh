@@ -4,6 +4,7 @@ Author: Ajay Singh
 Version: 1.1
 date: 20-05-2024
 '
+
 # Read the repository path from a file (e.g., repo_path.txt)
 repo_path=$(<repo_path.txt)
 
@@ -16,5 +17,17 @@ else
     exit 1
 fi
 
-echo "Updating Status..."
+echo "Adding all files..."
+git add .
+
+echo "Committing..."
+commit_message=$(<commitM.txt)
+baseline_message="baseline"
+
+git commit -m "$commit_message $baseline_message"
+
+echo "Pushing into the branch..."
+git push
+
+echo "Updating status..."
 git status
