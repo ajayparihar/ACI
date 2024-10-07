@@ -1,4 +1,4 @@
-# Git Repository Management Scripts
+# Automated CI
 
 This repository contains a set of Bash scripts designed for managing Git repositories. Each script performs specific tasks related to Git operations.
 
