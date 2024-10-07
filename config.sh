@@ -1,55 +1,123 @@
 #!/bin/bash
 # Author: Ajay Singh
-# Version: 1.1
+# Version: 1.2
 # Date: 20-05-2024
 
-# Read the repository path from a file (e.g., repo_path.txt)
-if [ ! -f "repo_path.txt" ]; then
-    echo "Error: repo_path.txt not found!"
+# Constants
+DETAILS_FILE="repo_details.txt"
+COMMIT_MESSAGE_FILE="commit_message.txt"
+
+# Display help message
+show_help() {
+    cat << EOF
+Usage: $0 [-m commit_message] [-h]
+  -m commit_message  Inline commit message (overrides $COMMIT_MESSAGE_FILE)
+  -h                 Show this help message
+EOF
+    exit 0
+}
+
+# Log informational messages in green
+log_info() {
+    echo -e "\033[1;32mINFO:\033[0m $1"  # Green text for info
+}
+
+# Log error messages in red and exit
+log_error() {
+    echo -e "\033[1;31mERROR:\033[0m $1" >&2  # Red text for errors
     exit 1
-fi
+}
 
-repo_path=$(<repo_path.txt)
+# Check if Git is installed
+check_git_installed() {
+    command -v git &> /dev/null || log_error "Git is not installed. Install Git and try again."
+}
 
-# Ensure the commit message file exists and is readable before changing directory
-if [ ! -f "commitM.txt" ]; then
-    echo "Error: commitM.txt not found!"
-    exit 1
-fi
+# Read repository details from the repo_details.txt file
+read_repository_details() {
+    if [[ ! -f "$DETAILS_FILE" ]]; then
+        log_error "$DETAILS_FILE not found! Provide details via command line or create $DETAILS_FILE."
+    fi
 
-# Read commit message, trim newlines or extra spaces before changing directory
-echo "Reading commit message..."
-commit_message=$(<commitM.txt)
-commit_message=$(echo "$commit_message" | tr -d '\n\r')
+    mapfile -t details < "$DETAILS_FILE"
+    repo_path=$(echo "${details[0]}" | xargs)  # Trim whitespace
+    branch_name=$(echo "${details[1]}" | xargs)  # Trim whitespace
+}
 
-# Check if the commit message is empty after trimming
-if [ -z "$commit_message" ]; then
-    echo "Error: Commit message is empty!"
-    exit 1
-fi
+# Convert Windows-style path to Unix-style path for Git Bash
+convert_windows_path_to_unix() {
+    local path="$1"
+    if [[ "$path" =~ ^([A-Z]): ]]; then
+        path="/${BASH_REMATCH[1],,}/$(echo "$path" | sed 's|\\|/|g' | sed 's|^[A-Z]:||')"
+    fi
+    echo "$path"
+}
 
-# Now, check if the repo path exists and change directory
-if [ -d "$repo_path" ]; then
-    echo "Navigating to the repository folder: $repo_path"
-    cd "$repo_path" || exit
-else
-    echo "Error: Repository path not found: $repo_path"
-    exit 1
-fi
+# Get the commit message from the commit_message.txt file or the inline argument
+get_commit_message() {
+    local inline_commit_message="$1"
 
-echo "Adding all files..."
-git add .
+    if [[ ! -f "$COMMIT_MESSAGE_FILE" && -z "$inline_commit_message" ]]; then
+        log_error "$COMMIT_MESSAGE_FILE not found! Provide a valid commit message or use -m option."
+    fi
 
-# Prepare the commit message with the config
-config_message="_config"
+    if [[ -n "$inline_commit_message" ]]; then
+        echo "$inline_commit_message"  # Use the inline commit message
+    else
+        commit_message=$(<"$COMMIT_MESSAGE_FILE")
+        commit_message=$(echo "$commit_message" | tr -d '\n\r')  # Trim newlines
+        [[ -z "$commit_message" ]] && log_error "Commit message is empty after trimming!"
+        echo "$commit_message"
+    fi
+}
 
-# Output final commit command
-echo "Executing git commit -m '$commit_message $config_message'"
-git commit -m "$commit_message $config_message"
+# Main script logic
+main() {
+    local commit_message=""
 
-echo "Pushing into the branch..."
-# Specify the branch to push to (replace 'main' with the actual branch if needed)
-git push origin main
+    # Parse command-line options
+    while getopts ":m:h" opt; do
+        case "$opt" in
+            m) commit_message="$OPTARG" ;;  # Set inline commit message
+            h) show_help ;;                  # Show help message
+            *) log_error "Invalid option: -$OPTARG" ;;  # Handle invalid options
+        esac
+    done
 
-echo "Updating status..."
-git status
+    # Read repository details from file
+    read_repository_details
+
+    # Convert the repository path to Unix format
+    repo_path=$(convert_windows_path_to_unix "$repo_path")
+
+    # Get the commit message
+    commit_message=$(get_commit_message "$commit_message")
+
+    # Ensure Git is installed
+    check_git_installed
+
+    # Validate the repository path
+    [[ ! -d "$repo_path" ]] && log_error "Repository path not found: $repo_path"
+
+    log_info "Navigating to repository: $repo_path"
+    cd "$repo_path" || log_error "Failed to access directory: $repo_path"
+
+    log_info "Adding all files..."
+    git add . || log_error "Failed to add files to the Git index!"
+
+    # Prepare the commit message with the config
+    local config_message="_config"
+
+    # Execute the git commit
+    log_info "Executing git commit -m '$commit_message $config_message'"
+    git commit -m "$commit_message$config_message" || log_error "Git commit failed!"
+
+    log_info "Pushing changes to the branch..."
+    git push origin "$branch_name" || log_error "Git push failed!"
+
+    log_info "Updating repository status..."
+    git status
+}
+
+# Execute the main function
+main "$@"

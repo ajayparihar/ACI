@@ -1,0 +1,16 @@
+2024-10-07 18:12:13 [INFO] Navigating to the repository folder: C:\Users\ajays\OneDrive\Desktop\ACI_repo-Test
+2024-10-07 18:20:53 [ERROR] Missing repo path or branch name in repo_details.txt.
+2024-10-07 18:22:58 [ERROR] Repository path not found: # The full path to your Git repository
+2024-10-07 18:24:44 [ERROR] Repository path not found: C:\Users\ajays\OneDrive\Desktop\ACI_repo-Test   # The full path to your Git repository
+2024-10-07 18:25:00 [ERROR] Repository path not found: C:\Users\ajays\OneDrive\Desktop\ACI_repo-Test
+2024-10-07 18:25:15 [ERROR] Repository path not found: C:\Users\ajays\OneDrive\Desktop\ACI_repo-Test
+2024-10-07 18:26:22 [ERROR] Repository path not found: /c/Users/ajays/OneDrive/Desktop/ACI_repo-Test
+2024-10-07 18:28:10 [INFO] Navigating to repository: /c/Users/ajays/OneDrive/Desktop/ACI_repo-Test
+2024-10-07 18:28:20 [INFO] Navigating to repository: /c/Users/ajays/OneDrive/Desktop/ACI_repo-Test
+2024-10-07 18:29:26 [INFO] Navigating to repository: /c/Users/ajays/OneDrive/Desktop/ACI_repo-Test
+2024-10-07 18:29:54 [INFO] Navigating to repository: /c/Users/ajays/OneDrive/Desktop/ACI_repo-Test
+2024-10-07 18:31:16 [INFO] Navigating to repository: /c/Users/ajays/OneDrive/Desktop/ACI_repo-Test
+2024-10-07 18:31:21 [INFO] Navigating to repository: /c/Users/ajays/OneDrive/Desktop/ACI_repo-Test
+2024-10-07 18:32:03 [INFO] Navigating to repository: /c/Users/ajays/OneDrive/Desktop/ACI_repo-Test
+2024-10-07 18:56:39 [ERROR] repo_path.txt not found! Provide a path with -p or create repo_path.txt.
+2024-10-07 18:57:07 [ERROR] repo_path.txt not found! Provide a path with -p or create repo_path.txt.
