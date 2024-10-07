@@ -1,4 +1,3 @@
-```markdown
 # Git Repository Management Scripts
 
 This repository contains a set of Bash scripts designed for managing Git repositories. Each script performs specific tasks related to Git operations.
@@ -20,6 +19,7 @@ This repository contains a set of Bash scripts designed for managing Git reposit
 3. **Make Scripts Executable**: Run the following command for each script:
    ```bash
    chmod +x <script_name>.sh
+
    ```
 
 ## How to Use
