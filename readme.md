@@ -156,12 +156,3 @@ Each script can be executed with specific command-line options. Use the `-h` opt
 - Displays errors for Git installation and directory access issues.
 
 ---
-
-## Additional Important Notes
-
-- **Backup**: Always ensure you have backups of important data before running operations that modify commit history or repository states.
-- **Testing**: It’s a good practice to test scripts in a safe environment (like a test repository) before using them on critical projects.
-- **Permissions**: Make sure you have the necessary permissions to access and modify the repository and its files.
-- **Logging**: Consider adding logging features to track actions performed by the scripts for future reference and debugging.
-
-```
