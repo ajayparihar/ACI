@@ -1,7 +1,18 @@
 #!/bin/bash
+# File Name: config.sh
+# Description: This script automates the process of committing and pushing changes 
+#              to a Git repository. It reads the repository path and branch name from 
+#              a file, optionally takes an inline commit message, and commits changes 
+#              to the repository.
 # Author: Ajay Singh
 # Version: 1.3
 # Date: 20-05-2024
+
+# Color Codes
+COLOR_INFO="\033[1;32m"   # Green for info
+COLOR_ERROR="\033[1;31m"  # Red for errors
+COLOR_MAIN="\033[1;35m"   # Dark pink for repository path and branch name
+COLOR_RESET="\033[0m"     # Reset color
 
 # Constants
 DETAILS_FILE="repo_details.txt"
@@ -19,19 +30,19 @@ EOF
 
 # Log informational messages in green
 log_info() {
-    echo -e "\033[1;32mINFO:\033[0m $1"  # Green text for info
+    echo -e "${COLOR_INFO}INFO:${COLOR_RESET} $1"  # Green text for info
 }
 
 # Log error messages in red and exit
 log_error() {
-    echo -e "\033[1;31mERROR:\033[0m $1" >&2  # Red text for errors
+    echo -e "${COLOR_ERROR}ERROR:${COLOR_RESET} $1" >&2  # Red text for errors
     exit 1
 }
 
-# Log the repository path and branch in yellow
+# Log the repository path and branch in pink (COLOR_MAIN)
 log_repo_and_branch() {
-    echo -e "\033[1;33mREPO PATH:\033[0m $1"   # Yellow text for repository path
-    echo -e "\033[1;33mBRANCH NAME:\033[0m $2" # Yellow text for branch name
+    echo -e "${COLOR_MAIN}REPO PATH:${COLOR_RESET} $1"   # Pink text for repository path
+    echo -e "${COLOR_MAIN}BRANCH NAME:${COLOR_RESET} $2" # Pink text for branch name
 }
 
 # Check if Git is installed
@@ -96,7 +107,7 @@ main() {
     # Convert the repository path to Unix format
     repo_path=$(convert_windows_path_to_unix "$repo_path")
 
-    # Log the repository path and branch name in yellow
+    # Log the repository path and branch name in pink
     log_repo_and_branch "$repo_path" "$branch_name"
 
     # Get the commit message
@@ -118,7 +129,7 @@ main() {
     local config_message="_config"
 
     # Execute the git commit
-    log_info "Executing git commit -m '$commit_message $config_message'"
+    log_info "Executing git commit -m '$commit_message$config_message'"
     git commit -m "$commit_message$config_message" || log_error "Git commit failed!"
 
     log_info "Pushing changes to the branch..."

@@ -1,15 +1,25 @@
 #!/bin/bash
+# File Name: reset.sh
+# Description: This script resets a specified number of commits on a given branch of a Git repository. 
+#              It can take the repository path, branch name, and number of commits as command-line arguments 
+#              or read the repository path from a specified file.
 # Author: Ajay Singh
 # Version: 1.3
-# Date: 20-05-2024
+# Date: 09-10-2024
 
 # Constants
 DETAILS_FILE="repo_details.txt"
 
+# Color Codes
+COLOR_INFO="\033[1;32m"   # Green for info
+COLOR_ERROR="\033[1;31m"  # Red for errors
+COLOR_MAIN="\033[1;35m"   # Dark pink for repository path and branch name
+COLOR_RESET="\033[0m"     # Reset color
+
 # Display help message
 show_help() {
     echo "Usage: $0 [-p repo_path] [-b branch_name] [-n num_commits] [-h]"
-    echo "  -p repo_path      Git repository path (overrides repo_details.txt)"
+    echo "  -p repo_path      Git repository path (overrides $DETAILS_FILE)"
     echo "  -b branch_name    Branch to reset (default: current branch)"
     echo "  -n num_commits    Number of commits to reset (default: 1), can be a range (e.g., 1-3)"
     echo "  -h                Show this help message"
@@ -18,19 +28,19 @@ show_help() {
 
 # Log informational messages in green
 log_info() {
-    echo -e "\033[1;32mINFO:\033[0m $1"  # Green text for info
+    echo -e "${COLOR_INFO}INFO:${COLOR_RESET} $1"  # Green text for info
 }
 
 # Log error messages in red and exit
 log_error() {
-    echo -e "\033[1;31mERROR:\033[0m $1" >&2  # Red text for errors
+    echo -e "${COLOR_ERROR}ERROR:${COLOR_RESET} $1" >&2  # Red text for errors
     exit 1
 }
 
-# Log repository path and branch name in yellow
+# Log repository path and branch name in dark pink
 log_repo_info() {
-    echo -e "\033[1;33mREPO PATH:\033[0m $1"  # Yellow text for repo path
-    echo -e "\033[1;33mBRANCH NAME:\033[0m $2"  # Yellow text for branch name
+    echo -e "${COLOR_MAIN}REPO PATH:${COLOR_RESET} $1"  # Dark pink text for repo path
+    echo -e "${COLOR_MAIN}BRANCH NAME:${COLOR_RESET} $2"  # Dark pink text for branch name
 }
 
 # Check if Git is installed
@@ -111,7 +121,7 @@ main() {
             branch_name=$(git rev-parse --abbrev-ref HEAD)
         fi
         
-        # Log the branch name and repository path in yellow
+        # Log the branch name and repository path in dark pink
         log_repo_info "$repo_path" "$branch_name"
         
         log_info "Resetting the last $num_commits commit(s) on branch '$branch_name'"

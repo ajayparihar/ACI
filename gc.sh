@@ -1,10 +1,11 @@
 #!/bin/bash
+# File Name: gc.sh
+# Description: This script executes a specified Git command in a designated Git repository. 
+#              It can take the repository path and Git command as command-line arguments 
+#              or read them from a specified file.
 # Author: Ajay Singh
-# Version: 1.3
+# Version: 1.1
 # Date: 20-10-2024
-
-# Constants
-DETAILS_FILE="repo_details.txt"
 
 # Color Codes
 COLOR_INFO="\033[1;32m"   # Green for info
@@ -12,11 +13,14 @@ COLOR_ERROR="\033[1;31m"  # Red for errors
 COLOR_MAIN="\033[1;35m"   # Dark pink for repository path and branch name
 COLOR_RESET="\033[0m"     # Reset color
 
+# Constants
+DETAILS_FILE="repo_details.txt"
+
 # Display help message
 show_help() {
     echo "Usage: $0 [--git <git_command>] [-p repo_path] [-h]"
     echo "  --git <git_command>    Run a Git command in the repository."
-    echo "  -p <repo_path>         Specify Git repository path (overrides repo_details.txt)"
+    echo "  -p <repo_path>         Specify Git repository path (overrides $DETAILS_FILE)"
     echo "  -h                     Show this help message"
     exit 0
 }

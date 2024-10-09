@@ -1,4 +1,7 @@
 #!/bin/bash
+# File Name: repo_status.sh
+# Description: This script checks the status of a Git repository. 
+#              It can take the repository path as a command-line argument or read it from a specified file.
 # Author: Ajay Singh
 # Version: 1.3
 # Date: 20-05-2024
@@ -6,32 +9,38 @@
 # Constants
 DETAILS_FILE="repo_details.txt"
 
+# Color Codes
+COLOR_INFO="\033[1;32m"   # Green for info
+COLOR_ERROR="\033[1;31m"  # Red for errors
+COLOR_MAIN="\033[1;35m"   # Dark pink for repository path and branch name
+COLOR_RESET="\033[0m"     # Reset color
+
 # Display help message
 show_help() {
     echo "Usage: $0 [-p repo_path] [-h]"
-    echo "  -p repo_path    Git repository path (overrides repo_details.txt)"
+    echo "  -p repo_path    Git repository path (overrides $DETAILS_FILE)"
     echo "  -h              Show this help message"
     exit 0
 }
 
 # Log informational messages in green
 log_info() {
-    echo -e "\033[1;32mINFO:\033[0m $1" # Green text for info
+    echo -e "${COLOR_INFO}INFO:${COLOR_RESET} $1" # Green text for info
 }
 
 # Log error messages in red and exit
 log_error() {
-    echo -e "\033[1;31mERROR:\033[0m $1" >&2 # Red text for errors
+    echo -e "${COLOR_ERROR}ERROR:${COLOR_RESET} $1" >&2 # Red text for errors
     exit 1
 }
 
-# Log repo path and branch name in yellow
+# Log repo path and branch name in Dark pink
 log_repo_path() {
-    echo -e "\033[1;33mREPO PATH:\033[0m $1" # Yellow text for repo path
+    echo -e "${COLOR_MAIN}REPO PATH:${COLOR_RESET} $1" # Dark pink text for repo path
 }
 
 log_branch_name() {
-    echo -e "\033[1;33mBRANCH NAME:\033[0m $1" # Yellow text for branch name
+    echo -e "${COLOR_MAIN}BRANCH NAME:${COLOR_RESET} $1" # Dark pink text for branch name
 }
 
 # Check if Git is installed
@@ -83,7 +92,7 @@ main() {
         log_error "Repository path not found: $repo_path"
     fi
 
-    # Log the repo path in yellow
+    # Log the repo path in Dark pink
     log_repo_path "$repo_path"
 
     log_info "Navigating to repository"
@@ -95,7 +104,7 @@ main() {
         # Get current branch name
         branch_name=$(git rev-parse --abbrev-ref HEAD)
         
-        # Log the branch name in yellow
+        # Log the branch name in Dark pink
         log_branch_name "$branch_name"
 
         log_info "Running git status"
