@@ -9,6 +9,7 @@ This repository contains a set of Bash scripts designed for managing Git reposit
 - **`base.sh`**: Commits and pushes changes to the repository.
 - **`config.sh`**: Similar to `base.sh` but modifies the commit message.
 - **`reset.sh`**: Resets a specified number of commits on a branch.
+- **`gc.sh`**: Executes specified Git commands in the repository and handles outputs efficiently.
 
 ## How to Setup
 
@@ -156,3 +157,38 @@ Each script can be executed with specific command-line options. Use the `-h` opt
 - Displays errors for Git installation and directory access issues.
 
 ---
+
+Certainly! Here’s the `gc.sh` documentation formatted in the same style as the previous scripts:
+
+---
+
+### Script 6: `gc.sh`
+
+#### Usage
+```bash
+./gc.sh --git <command1> [<command2> ...]
+```
+- To specify a repository path:
+```bash
+./gc.sh --git status --git log -p <repository_path>
+```
+- To see the help message:
+```bash
+./gc.sh -h
+```
+
+
+#### Functionality
+- Checks if Git is installed on the system.
+- Reads the repository path from `repo_details.txt` or accepts it as a command-line argument.
+- Supports executing multiple Git commands in sequence, providing feedback for each command executed.
+- If no commands are provided, defaults to executing `git status`.
+- Automatically disables the pager for lengthy outputs (e.g., `git log`) to prevent issues with viewing large logs.
+
+#### Error Handling
+- Displays an error message if Git is not installed.
+- Checks if the `repo_details.txt` file exists and reads the repository path from it if not provided.
+- Validates the existence of the specified repository path before executing commands.
+- Handles invalid Git commands gracefully and displays appropriate error messages.
+
+--- 
