@@ -1,34 +1,45 @@
 #!/bin/bash
 # Author: Ajay Singh
 # Version: 1.3
-# Date: 20-05-2024
+# Date: 20-10-2024
 
 # Constants
 DETAILS_FILE="repo_details.txt"
 
+# Color Codes
+COLOR_INFO="\033[1;32m"   # Green for info
+COLOR_ERROR="\033[1;31m"  # Red for errors
+COLOR_MAIN="\033[1;35m"   # Dark pink for repository path and branch name
+COLOR_RESET="\033[0m"     # Reset color
+
 # Display help message
 show_help() {
-    echo "Usage: $0 --git command1 [command2 ...] [-p repo_path] [-h]"
-    echo "  --git command    Git command to execute in the repository (default: 'git status')"
-    echo "  -p repo_path     Git repository path (overrides repo_details.txt)"
-    echo "  -h               Show this help message"
+    echo "Usage: $0 [--git <git_command>] [-p repo_path] [-h]"
+    echo "  --git <git_command>    Run a Git command in the repository."
+    echo "  -p <repo_path>         Specify Git repository path (overrides repo_details.txt)"
+    echo "  -h                     Show this help message"
     exit 0
 }
 
 # Log informational messages in green
 log_info() {
-    echo -e "\033[1;32mINFO:\033[0m $1" # Green text for info
+    echo -e "${COLOR_INFO}INFO:${COLOR_RESET} $1"
 }
 
 # Log error messages in red and exit
 log_error() {
-    echo -e "\033[1;31mERROR:\033[0m $1" >&2 # Red text for errors
+    echo -e "${COLOR_ERROR}ERROR:${COLOR_RESET} $1" >&2
     exit 1
 }
 
-# Log repo path in yellow
-log_repo_path() {
-    echo -e "\033[1;33mREPO PATH:\033[0m $1" # Yellow text for repo path
+# Log repository path in dark pink
+log_repo_info() {
+    echo -e "${COLOR_MAIN}REPO PATH:${COLOR_RESET} $1"
+}
+
+# Log branch name in dark pink
+log_branch_info() {
+    echo -e "${COLOR_MAIN}BRANCH NAME:${COLOR_RESET} $1"
 }
 
 # Check if Git is installed
@@ -41,55 +52,55 @@ read_details_file() {
     if [[ ! -f "$DETAILS_FILE" ]]; then
         log_error "$DETAILS_FILE not found! Provide details via -p or create $DETAILS_FILE."
     fi
-    repo_path_file=$(awk 'NR==1 {print $0}' "$DETAILS_FILE" | xargs) # Get first line as repo path
+
+    repo_path_file=$(awk 'NR==1 {print $0}' "$DETAILS_FILE" | xargs)
+
+    # Check if the repo path is empty
+    if [[ -z "$repo_path_file" ]]; then
+        log_error "$DETAILS_FILE is empty! Provide a valid repository path."
+    fi
 }
 
 # Convert Windows-style path to Unix-style path for Git Bash
 convert_path() {
     local path="$1"
-    if [[ "$path" =~ ^([A-Z]): ]]; then
-        path="/${BASH_REMATCH[1],,}/$(echo "${path:2}" | sed 's|\\|/|g')"
-    fi
+    [[ "$path" =~ ^([A-Z]): ]] && path="/${BASH_REMATCH[1],,}/$(echo "$path" | sed 's|\\|/|g' | sed 's|^[A-Z]:||')"
     echo "$path"
 }
 
 # Main logic
 main() {
     local repo_path=""
-    local commands=()
+    local git_command=()
 
     # Parse command-line options
-    while [[ $# -gt 0 ]]; do
+    while [[ "$#" -gt 0 ]]; do
         case "$1" in
-            --git) 
+            --git)
                 shift
-                # Collect all following arguments until another option or end of input
-                while [[ $# -gt 0 && "$1" != -* ]]; do
-                    commands+=("$1") # Collect commands without '--git'
+                # Capture everything after --git as part of the Git command
+                while [[ "$#" -gt 0 ]]; do
+                    git_command+=("$1")
                     shift
                 done
                 ;;
-            -p) 
-                repo_path=$(convert_path "$2")
-                shift 2
+            -p)
+                shift
+                repo_path=$(convert_path "$1")
+                shift
                 ;;
-            -h) 
+            -h)
                 show_help
                 ;;
-            *) 
+            *)
                 log_error "Invalid option: $1"
                 ;;
         esac
     done
 
-    # If no commands are provided, default to 'git status'
-    if [[ ${#commands[@]} -eq 0 ]]; then
-        commands=("status") # Default command
-    fi
-
     # Read details from the file if not provided via command-line options
     read_details_file
-    repo_path="${repo_path:-$repo_path_file}" # Use details file path if command-line path is not set
+    repo_path="${repo_path:-$repo_path_file}"
 
     # Ensure the repo path is set
     if [[ -z "$repo_path" ]]; then
@@ -101,24 +112,27 @@ main() {
         log_error "Repository path not found: $repo_path"
     fi
 
-    # Log the repo path in yellow
-    log_repo_path "$repo_path"
+    log_info "Navigating to repository"  # Log info message first
+    log_repo_info "$repo_path"  # Log repository path in dark pink
 
-    log_info "Navigating to repository"
-
-    # Change to the repository directory and run the Git commands
+    # Change to the repository directory
     (
         cd "$repo_path" || log_error "Failed to access directory: $repo_path"
 
-        for command in "${commands[@]}"; do
-            log_info "Running command: git $command"
-            if [[ "$command" == "log" ]]; then
-                # Disable pager for 'git log' to avoid lengthy output issues
-                git --no-pager "$command" || log_error "Command failed: git $command"
-            else
-                git "$command" || log_error "Command failed: git $command"
-            fi
-        done
+        # Determine the current branch name
+        branch_name=$(git rev-parse --abbrev-ref HEAD 2>/dev/null) || log_error "Failed to get current branch name."
+        
+        # Log branch name in dark pink after changing the directory
+        log_branch_info "$branch_name"
+
+        # Run the Git command
+        if [[ ${#git_command[@]} -eq 0 ]]; then
+            # Default to 'git status' if no --git command is provided
+            git_command=("status")
+        fi
+
+        log_info "Running command: git ${git_command[*]}"
+        git "${git_command[@]}" || log_error "Command failed: git ${git_command[*]}"
     )
 }
 
