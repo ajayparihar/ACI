@@ -8,9 +8,10 @@ DETAILS_FILE="repo_details.txt"
 
 # Display help message
 show_help() {
-    echo "Usage: $0 [-p repo_path] [-h]"
-    echo "  -p repo_path    Git repository path (overrides repo_details.txt)"
-    echo "  -h              Show this help message"
+    echo "Usage: $0 --git command1 [command2 ...] [-p repo_path] [-h]"
+    echo "  --git command    Git command to execute in the repository (default: 'git status')"
+    echo "  -p repo_path     Git repository path (overrides repo_details.txt)"
+    echo "  -h               Show this help message"
     exit 0
 }
 
@@ -25,13 +26,9 @@ log_error() {
     exit 1
 }
 
-# Log repo path and branch name in yellow
+# Log repo path in yellow
 log_repo_path() {
     echo -e "\033[1;33mREPO PATH:\033[0m $1" # Yellow text for repo path
-}
-
-log_branch_name() {
-    echo -e "\033[1;33mBRANCH NAME:\033[0m $1" # Yellow text for branch name
 }
 
 # Check if Git is installed
@@ -59,19 +56,40 @@ convert_path() {
 # Main logic
 main() {
     local repo_path=""
+    local commands=()
 
     # Parse command-line options
-    while getopts ":p:h" opt; do
-        case "$opt" in
-            p) repo_path=$(convert_path "$OPTARG") ;; # Convert and set repository path
-            h) show_help ;;                             # Show help message
-            *) log_error "Invalid option: -$OPTARG" ;; # Handle invalid options
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --git) 
+                shift
+                # Collect all following arguments until another option or end of input
+                while [[ $# -gt 0 && "$1" != -* ]]; do
+                    commands+=("$1") # Collect commands without '--git'
+                    shift
+                done
+                ;;
+            -p) 
+                repo_path=$(convert_path "$2")
+                shift 2
+                ;;
+            -h) 
+                show_help
+                ;;
+            *) 
+                log_error "Invalid option: $1"
+                ;;
         esac
     done
 
+    # If no commands are provided, default to 'git status'
+    if [[ ${#commands[@]} -eq 0 ]]; then
+        commands=("status") # Default command
+    fi
+
     # Read details from the file if not provided via command-line options
     read_details_file
-    repo_path="${repo_path:-$repo_path_file}"  # Use details file path if command-line path is not set
+    repo_path="${repo_path:-$repo_path_file}" # Use details file path if command-line path is not set
 
     # Ensure the repo path is set
     if [[ -z "$repo_path" ]]; then
@@ -88,18 +106,19 @@ main() {
 
     log_info "Navigating to repository"
 
-    # Change to the repository directory and run git status
+    # Change to the repository directory and run the Git commands
     (
         cd "$repo_path" || log_error "Failed to access directory: $repo_path"
 
-        # Get current branch name
-        branch_name=$(git rev-parse --abbrev-ref HEAD)
-        
-        # Log the branch name in yellow
-        log_branch_name "$branch_name"
-
-        log_info "Running git status"
-        git status
+        for command in "${commands[@]}"; do
+            log_info "Running command: git $command"
+            if [[ "$command" == "log" ]]; then
+                # Disable pager for 'git log' to avoid lengthy output issues
+                git --no-pager "$command" || log_error "Command failed: git $command"
+            else
+                git "$command" || log_error "Command failed: git $command"
+            fi
+        done
     )
 }
 

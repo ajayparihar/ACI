@@ -1,6 +1,6 @@
 #!/bin/bash
 # Author: Ajay Singh
-# Version: 1.2
+# Version: 1.3
 # Date: 20-05-2024
 
 # Constants
@@ -26,6 +26,12 @@ log_info() {
 log_error() {
     echo -e "\033[1;31mERROR:\033[0m $1" >&2  # Red text for errors
     exit 1
+}
+
+# Log the repository path and branch in yellow
+log_repo_and_branch() {
+    echo -e "\033[1;33mREPO PATH:\033[0m $1"   # Yellow text for repository path
+    echo -e "\033[1;33mBRANCH NAME:\033[0m $2" # Yellow text for branch name
 }
 
 # Ensure Git is installed
@@ -81,6 +87,9 @@ main() {
     # Get the final repo path and branch name
     read repo_path branch_name < <(get_repo_and_branch "$repo_path" "$branch_name")
 
+    # Log the repository path and branch name in yellow
+    log_repo_and_branch "$repo_path" "$branch_name"
+
     # Ensure Git is installed
     check_git_installed
 
@@ -89,9 +98,13 @@ main() {
 
     log_info "Navigating to repository: $repo_path"
 
-    # Change to the repository directory and check out the branch
+    # Change to the repository directory and pull the latest changes
     (
         cd "$repo_path" || log_error "Failed to access directory: $repo_path"
+
+        # Pull the latest changes from the current branch
+        log_info "Pulling latest changes from the repository"
+        git pull || log_error "Failed to pull latest changes. Please resolve any conflicts manually."
 
         log_info "Checking out branch: $branch_name"
         if git show-ref --verify --quiet refs/heads/"$branch_name"; then

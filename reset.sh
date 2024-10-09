@@ -1,6 +1,6 @@
 #!/bin/bash
 # Author: Ajay Singh
-# Version: 1.2
+# Version: 1.3
 # Date: 20-05-2024
 
 # Constants
@@ -25,6 +25,12 @@ log_info() {
 log_error() {
     echo -e "\033[1;31mERROR:\033[0m $1" >&2  # Red text for errors
     exit 1
+}
+
+# Log repository path and branch name in yellow
+log_repo_info() {
+    echo -e "\033[1;33mREPO PATH:\033[0m $1"  # Yellow text for repo path
+    echo -e "\033[1;33mBRANCH NAME:\033[0m $2"  # Yellow text for branch name
 }
 
 # Check if Git is installed
@@ -104,6 +110,9 @@ main() {
         if [[ -z "$branch_name" ]]; then
             branch_name=$(git rev-parse --abbrev-ref HEAD)
         fi
+        
+        # Log the branch name and repository path in yellow
+        log_repo_info "$repo_path" "$branch_name"
         
         log_info "Resetting the last $num_commits commit(s) on branch '$branch_name'"
         git reset --hard HEAD~"$num_commits" || log_error "Git reset failed!"

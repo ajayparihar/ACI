@@ -1,6 +1,6 @@
 #!/bin/bash
 # Author: Ajay Singh
-# Version: 1.2
+# Version: 1.3
 # Date: 20-05-2024
 
 # Constants
@@ -26,6 +26,12 @@ log_info() {
 log_error() {
     echo -e "\033[1;31mERROR:\033[0m $1" >&2  # Red text for errors
     exit 1
+}
+
+# Log the repository path and branch in yellow
+log_repo_and_branch() {
+    echo -e "\033[1;33mREPO PATH:\033[0m $1"   # Yellow text for repository path
+    echo -e "\033[1;33mBRANCH NAME:\033[0m $2" # Yellow text for branch name
 }
 
 # Check if Git is installed
@@ -90,6 +96,9 @@ main() {
     # Convert the repository path to Unix format
     repo_path=$(convert_windows_path_to_unix "$repo_path")
 
+    # Log the repository path and branch name in yellow
+    log_repo_and_branch "$repo_path" "$branch_name"
+
     # Get the commit message
     commit_message=$(get_commit_message "$commit_message")
 
@@ -109,7 +118,7 @@ main() {
     local baseline_message="_baseline"
 
     # Execute the git commit
-    log_info "Executing git commit -m '$commit_message $baseline_message'"
+    log_info "Executing git commit -m '$commit_message$baseline_message'"
     git commit -m "$commit_message$baseline_message" || log_error "Git commit failed!"
 
     log_info "Pushing changes to the branch..."
