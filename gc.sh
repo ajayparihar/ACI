@@ -82,11 +82,9 @@ main() {
         case "$1" in
             --git)
                 shift
-                # Capture everything after --git as part of the Git command
-                while [[ "$#" -gt 0 ]]; do
-                    git_command+=("$1")
-                    shift
-                done
+                # Capture the git command
+                git_command+=("$1")
+                shift
                 ;;
             -p)
                 shift
@@ -116,8 +114,8 @@ main() {
         log_error "Repository path not found: $repo_path"
     fi
 
-    log_info "Navigating to repository"  # Log info message first
-    log_repo_info "$repo_path"  # Log repository path in dark pink
+    log_info "Navigating to repository"
+    log_repo_info "$repo_path"
 
     # Change to the repository directory
     (
@@ -125,18 +123,17 @@ main() {
 
         # Determine the current branch name
         branch_name=$(git rev-parse --abbrev-ref HEAD 2>/dev/null) || log_error "Failed to get current branch name."
-        
-        # Log branch name in dark pink after changing the directory
         log_branch_info "$branch_name"
 
-        # Run the Git command
+        # Run the Git commands
         if [[ ${#git_command[@]} -eq 0 ]]; then
-            # Default to 'git status' if no --git command is provided
             git_command=("status")
         fi
 
-        log_info "Running command: git ${git_command[*]}"
-        git "${git_command[@]}" || log_error "Command failed: git ${git_command[*]}"
+        for cmd in "${git_command[@]}"; do
+            log_info "Running command: git $cmd"
+            git "$cmd" || log_error "Command failed: git $cmd"
+        done
     )
 }
 
